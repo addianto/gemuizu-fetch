@@ -1,7 +1,7 @@
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use scraper::{Html, Selector};
-use std::path::PathBuf;
 use std::error::Error;
+use std::path::PathBuf;
 
 fn build_cli() -> Command {
     Command::new(clap::crate_name!())
@@ -27,6 +27,16 @@ fn build_cli() -> Command {
                 .value_parser(clap::value_parser!(PathBuf))
                 .action(ArgAction::Set),
         )
+        .arg(
+            Arg::new("debug")
+                .long("debug")
+                .short('d')
+                .help("Debug mode")
+                .required(false)
+                .value_name("DEBUG")
+                .value_parser(clap::value_parser!(bool))
+                .action(ArgAction::SetTrue),
+        )
 }
 
 fn parse_title(document: &Html) -> Result<String, Box<dyn Error>> {
@@ -48,7 +58,8 @@ fn parse_title(document: &Html) -> Result<String, Box<dyn Error>> {
 fn parse_article_body(document: &Html) -> Result<String, Box<dyn Error>> {
     let selector: Selector = Selector::parse("div#article-body p")?;
 
-    let text = document.select(&selector)
+    let text = document
+        .select(&selector)
         .map(|e| e.text())
         .map(|t| t.collect::<Vec<_>>())
         .map(|t| t.join(" "))
@@ -69,6 +80,14 @@ fn main() -> Result<(), Box<dyn Error>> {
         Some(url) => url.to_string(),
         None => return Err("url is required".into()),
     };
+
+    if args.contains_id("debug") {
+        let debug_flag: bool = args.get_flag("debug");
+
+        if debug_flag {
+            println!("url: {}", url);
+        }
+    }
 
     let response_body: String = ureq::get(&url)
         .set(
