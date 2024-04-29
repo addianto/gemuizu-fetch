@@ -1,9 +1,9 @@
 [package]
 name = "gemuizu_fetch"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Daya Adianto <addianto@users.noreply.github.com>"]
-description = "An unofficial GameWith.jp page fetcher"
+description = "An unofficial GameWith page fetcher"
 repository = "https://github.com/addianto/gemuizu-fetch"
 readme = "README.md"
 license = "MIT"

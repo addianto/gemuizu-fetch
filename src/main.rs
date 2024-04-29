@@ -11,7 +11,7 @@ fn build_cli() -> Command {
         .arg_required_else_help(true)
         .arg(
             Arg::new("url")
-                .help("URL to a web page on GameWith.jp")
+                .help("URL(s) to a web page on GameWith")
                 .required(true)
                 .value_name("URL")
                 .value_parser(clap::value_parser!(String))

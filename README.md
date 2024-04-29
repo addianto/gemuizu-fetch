@@ -1,12 +1,13 @@
 # Gemuizu Fetch
 
-Gemuizu Fetch is a utility that fetches web pages from [GameWith Wiki Site](https://gamewith.jp) and presents them as plain text.
-It has been tested with the [Umamusume Strategy Wiki](https://gamewith.jp/uma-musume/), which is hosted on GameWith.
+Gemuizu Fetch is a utility that fetches web pages from GameWith ([EN](https://gamewith.net)/[JP](https://gamewith.jp))
+and presents them as plain text. It has been tested with [Palworld Wiki Guide (EN)](https://gamewith.net/palworld/)
+and [Umamusume Strategy Wiki (JP)](https://gamewith.jp/uma-musume/).
 
 ## Usage
 
 ```shell
-$ gemuizu_fetch [OPTIONS] <URL>
+$ gemuizu_fetch [OPTIONS] <URL1> <URL2> ... <URLn>
 ```
 
 Options:
