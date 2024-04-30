@@ -15,7 +15,8 @@ fn build_cli() -> Command {
                 .required(true)
                 .value_name("URL")
                 .value_parser(clap::value_parser!(String))
-                .action(ArgAction::Set),
+                .num_args(1..)
+                .action(ArgAction::Append),
         )
         .arg(
             Arg::new("output")
@@ -76,8 +77,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args: ArgMatches = cli.get_matches();
 
     // TODO: Validate the URL if the tool will be specific for retrieving pages from GameWith
-    let url: String = match args.get_one::<String>("url") {
-        Some(url) => url.to_string(),
+    let urls: Vec<String> = match args.get_many::<String>("url") {
+        Some(urls) => urls.map(|url| url.to_string()).collect(),
         None => return Err("url is required".into()),
     };
 
@@ -85,32 +86,34 @@ fn main() -> Result<(), Box<dyn Error>> {
         let debug_flag: bool = args.get_flag("debug");
 
         if debug_flag {
-            println!("url: {}", url);
+            println!("url: {}", urls.join(" "));
         }
     }
 
-    let response_body: String = ureq::get(&url)
-        .set(
-            "User-Agent",
-            "Mozilla/5.0 (Windows NT 10.0; rv:125.0) Gecko/20100101 Firefox/125.0",
-        )
-        .call()?
-        .into_string()?;
+    for url in urls {
+        let response_body: String = ureq::get(&url)
+            .set(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; rv:125.0) Gecko/20100101 Firefox/125.0",
+            )
+            .call()?
+            .into_string()?;
 
-    let html_document: Html = Html::parse_document(&response_body);
-    let title: String = parse_title(&html_document)?;
-    let article_body: String = parse_article_body(&html_document)?;
-    let content: String = format!("{} {}", title, article_body);
+        let html_document: Html = Html::parse_document(&response_body);
+        let title: String = parse_title(&html_document)?;
+        let article_body: String = parse_article_body(&html_document)?;
+        let content: String = format!("{} {}", title, article_body);
 
-    if args.contains_id("output") {
-        let output_file: PathBuf = match args.get_one::<PathBuf>("output") {
-            Some(output) => output.into(),
-            None => return Err("missing output file path".into()),
-        };
+        if args.contains_id("output") {
+            let output_file: PathBuf = match args.get_one::<PathBuf>("output") {
+                Some(output) => output.into(),
+                None => return Err("missing output file path".into()),
+            };
 
-        std::fs::write(output_file, content.as_bytes())?;
-    } else {
-        println!("{}", content);
+            std::fs::write(output_file, content.as_bytes())?;
+        } else {
+            println!("{}", content);
+        }
     }
 
     Ok(())
