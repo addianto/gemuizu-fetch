@@ -72,16 +72,14 @@ fn parse_article_body(document: &Html) -> Result<String, Box<dyn Error>> {
     }
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let cli: Command = build_cli();
-    let args: ArgMatches = cli.get_matches();
-
-    // TODO: Validate the URL if the tool will be specific for retrieving pages from GameWith
-    let urls: Vec<String> = match args.get_many::<String>("url") {
-        Some(urls) => urls.map(|url| url.to_string()).collect(),
+fn get_urls(args: &ArgMatches) -> Result<Vec<String>, Box<dyn Error>> {
+    match args.get_many::<String>("url") {
+        Some(urls) => Ok(urls.map(|url| url.to_string()).collect()),
         None => return Err("url is required".into()),
-    };
+    }
+}
 
+fn handle_debug(args: &ArgMatches, urls: &Vec<String>) {
     if args.contains_id("debug") {
         let debug_flag: bool = args.get_flag("debug");
 
@@ -89,6 +87,15 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("url: {}", urls.join(" "));
         }
     }
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let cli: Command = build_cli();
+    let args: ArgMatches = cli.get_matches();
+
+    let urls: Vec<String> = get_urls(&args)?;
+
+    handle_debug(&args, &urls);
 
     for url in urls {
         let response_body: String = ureq::get(&url)

@@ -25,6 +25,7 @@ Options:
 ## Why?
 
 I develop this utility to gather data sets for developing a Retrieval-Augmented Generation (RAG) agent.
+The idea is to obtain a corpus of plain text documents and use it to train embeddings.
 In addition, I want to practice writing code in Rust.
 
 ## License
